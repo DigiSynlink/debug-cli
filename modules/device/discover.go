@@ -9,8 +9,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var boardcastAddr = "239.255.255.252:9900"
-var magicString = "AreYouDigisynlink?"
+var boardcastAddr = "239.255.255.254:9999"
+var magicString = "AreYouDigiSynLink?"
 
 func DiscoverEntry(cCtx *cli.Context) error {
 	ifi := cCtx.String("interface")
@@ -56,14 +56,12 @@ func LookForDevice(ifi string) error {
 
 	defer conn.Close()
 
-	// Send a boardcase
 	logger.Info("Sending boardcast...")
 	_, err = conn.WriteTo([]byte(magicString), addr)
 
 	if err != nil {
 		return err
 	}
-
 	buf := make([]byte, 1024)
 
 	for {
@@ -77,7 +75,7 @@ func LookForDevice(ifi string) error {
 		if err != nil {
 			logger.Info("Exit with Error: ", err)
 			logger.Info("It may be a timeout, so we will exit now. Restart the program to try again.")
-			return nil
+			return err
 		}
 	}
 }

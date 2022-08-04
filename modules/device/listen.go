@@ -1,6 +1,7 @@
 package device
 
 import (
+	"encoding/json"
 	"fmt"
 	"net"
 	"time"
@@ -9,6 +10,21 @@ import (
 )
 
 var announceAddr = "239.255.255.254:9900"
+
+type DeviceAnnouncement struct {
+	Action          string `json:"action"`
+	Active          string `json:"active"`
+	Hostname        string `json:"hostname"`
+	DeviceName      string `json:"device_name"`
+	DeviceCategory  string `json:"device_category"`
+	DeviceType      string `json:"device_type"`
+	ChannelNumber   string `json:"channel_num"`
+	InChannelNames  string `json:"in_channel_names"`
+	OutChannelNames string `json:"out_channel_names"`
+	IP              string `json:"ip"`
+	IPConflict      string `json:"ip_conflict"`
+	OnlineVersion   string `json:"online_version"`
+}
 
 func ListenEntry(cCtx *cli.Context) error {
 	ifi := cCtx.String("interface")
@@ -56,12 +72,33 @@ func Listen(ifi string) error {
 
 	buf := make([]byte, 1024)
 	logger.Warn("To stop Listen, press Ctrl+C")
+	res := make(map[string]DeviceAnnouncement)
+
 	for {
 		logger.Info("Waiting for a response... 30s Deadline")
 		pc.SetReadDeadline(time.Now().Add(time.Second * 30))
 		n, dst, err := pc.ReadFrom(buf)
 		if n > 0 {
-			fmt.Printf("%s sent this: %s\n", dst, buf[:n])
+			logger.Debug(fmt.Sprintf("%s sent this: %s\n", dst, buf[:n]))
+			announcement := DeviceAnnouncement{}
+			err := json.Unmarshal(buf[:n], &announcement)
+			if err != nil {
+				logger.Error("Error parsing announcement: ", err)
+			} else {
+				if _, ok := res[announcement.DeviceName]; !ok {
+					res[announcement.DeviceName] = announcement
+					logger.Info("Device: ", announcement.DeviceName, "(", announcement.IP, ")", " is online")
+				}
+			}
+		}
+
+		if len(res) > 0 {
+			logger.Info("Current Online Machines:")
+			for k, v := range res {
+				logger.Info("\t", k, ": ", v)
+			}
+		} else {
+			logger.Warn("No online devices at this time...")
 		}
 
 		if err != nil {
