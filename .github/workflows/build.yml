@@ -1,0 +1,38 @@
+name: build
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: build artifacts
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # build and publish in parallel: linux/386, linux/amd64, linux/arm64, windows/386, windows/amd64, darwin/amd64, darwin/arm64
+        goos: [linux, windows, darwin]
+        goarch: ["386", amd64, arm64]
+        exclude:
+          - goarch: "386"
+            goos: darwin
+          - goarch: arm64
+            goos: windows
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+            go build -o debug-cli \
+            -ldflags "-X main.gitCommit=${{ github.head_ref }}.${{ github.sha }}" \
+            -ldflags "-X main.buildDate=`date -u +DATE.%Y%m%d.%H%M%S`"
+
+      - name: Go Release Binaries
+        uses: wangyoucao577/go-release-action@v1.30
+        with:
+          goos: ${{ matrix.goos }}
+          goarch: ${{ matrix.goarch }}
+          overwrite: true
+          pre_command: export CGO_ENABLED=0
+          ldflags: "-X 'main.gitCommit=${{ github.head_ref }}.${{ github.sha }}' -X 'main.buildDate=`date -u +DATE.%Y%m%d.%H%M%S`'"
+          binary_name: debug-cli
+          asset_name: "debug-cli-${{ env.BUILD_TIME }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
