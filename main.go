@@ -1,43 +1,47 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"time"
 
-	"github.com/digisynlink/debug-cli/modules/find"
+	"github.com/digisynlink/debug-cli/modules/device"
+	"github.com/digisynlink/debug-cli/modules/version"
 	"github.com/digisynlink/debug-cli/utils"
+	"github.com/sirupsen/logrus"
 
 	"github.com/urfave/cli/v2"
 )
 
-var gitCommit string
-var buildDate string
+var logger = utils.GetInstance()
 
 func main() {
-	logger := utils.GetInstance()
 	app := &cli.App{
-		Name:  "network-debug",
-		Usage: "DigitSynlink network debug tool",
-		Commands: []*cli.Command{
-			{
-				Name:    "find",
-				Aliases: []string{"f"},
-				Usage:   "Find a device",
-				Action: func(cCtx *cli.Context) error {
-					return find.LookForDevice()
-				},
-			},
-			{
-				Name:    "version",
-				Aliases: []string{"v"},
-				Usage:   "Show version",
-				Action: func(cCtx *cli.Context) error {
-					fmt.Printf("Commit: %s \nBuildDate: %s\n", gitCommit, buildDate)
-					return nil
-				},
+		Name:      "debug-cli",
+		Version:   "0.0.1",
+		Compiled:  time.Now(),
+		Copyright: "Copyright © 2020 digisynlink",
+		Usage:     "DigitSynlink network debug tool",
+		Commands:  []*cli.Command{},
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "debug-level",
+				Aliases: []string{"lvl"},
+				Usage:   "Debug level, available values: debug, info, warn, error",
+				Value:   "info",
 			},
 		},
+		Before: func(cCtx *cli.Context) error {
+			parsed, err := logrus.ParseLevel(cCtx.String("debug-level"))
+			if err != nil {
+				return err
+			}
+			logger.SetLevel(parsed)
+			return nil
+		},
 	}
+
+	device.RegisterCommand(app)
+	version.RegisterCommand(app)
 
 	if err := app.Run(os.Args); err != nil {
 		logger.Fatal(err)

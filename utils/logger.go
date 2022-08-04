@@ -18,5 +18,6 @@ func GetInstance() *logrus.Logger {
 }
 
 func createLogger() *logrus.Logger {
-	return logrus.New()
+	l := logrus.New()
+	return l
 }
