@@ -2,6 +2,8 @@
 
 DigiSyn Link Network Debug CLI
 
+**Download latest Binary here:** https://github.com/DigiSynlink/debug-cli/releases/tag/dev
+
 ## Quick Example
 
 For more info, run without any args to see help info
