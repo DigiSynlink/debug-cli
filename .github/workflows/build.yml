@@ -20,6 +20,9 @@ jobs:
             goos: windows
     steps:
       - uses: actions/checkout@v3
+      - name: Get current date
+        run: |
+          echo "BUILD_DATE=`date -u +.%Y%m%d.%H%M%S`" >> $GITHUB_ENV
       - name: Go Release Binaries
         uses: wangyoucao577/go-release-action@v1.30
         with:
@@ -27,7 +30,7 @@ jobs:
           goarch: ${{ matrix.goarch }}
           overwrite: true
           pre_command: export CGO_ENABLED=0
-          ldflags: "-X 'github.com/digisynlink/debug-cli/modules/version.gitCommit=${{ github.head_ref }}.${{ github.sha }}' -X 'github.com/digisynlink/debug-cli/modules/version.buildDate=`date -u +DATE.%Y%m%d.%H%M%S`'"
+          ldflags: "-X github.com/digisynlink/debug-cli/modules/version.GitCommit=${{ github.head_ref }}.${{ github.sha }} -X github.com/digisynlink/debug-cli/modules/version.BuildDate=${{ env.BUILD_DATE }}"
           binary_name: debug-cli
           release_tag: dev
           asset_name: "debug-cli-${{ matrix.goos }}-${{ matrix.goarch }}"

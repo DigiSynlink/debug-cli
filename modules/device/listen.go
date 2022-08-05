@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
+	"net/url"
 	"time"
 
 	"github.com/urfave/cli/v2"
@@ -24,6 +25,15 @@ type DeviceAnnouncement struct {
 	IP              string `json:"ip"`
 	IPConflict      string `json:"ip_conflict"`
 	OnlineVersion   string `json:"online_version"`
+}
+
+func (d *DeviceAnnouncement) cleanUp() {
+	name, err := url.QueryUnescape(d.DeviceName)
+	if err != nil {
+		logger.Error("Error decoding the string %v", err)
+		return
+	}
+	d.DeviceName = name
 }
 
 func ListenEntry(cCtx *cli.Context) error {
@@ -75,16 +85,19 @@ func Listen(ifi string) error {
 	res := make(map[string]DeviceAnnouncement)
 
 	for {
-		logger.Info("Waiting for a response... 30s Deadline")
-		pc.SetReadDeadline(time.Now().Add(time.Second * 30))
+		logger.Info("Waiting for a response... 1min Deadline")
+		pc.SetReadDeadline(time.Now().Add(time.Minute * 1))
 		n, dst, err := pc.ReadFrom(buf)
 		if n > 0 {
 			logger.Debug(fmt.Sprintf("%s sent this: %s\n", dst, buf[:n]))
+
+			// Trying to parse response
 			announcement := DeviceAnnouncement{}
 			err := json.Unmarshal(buf[:n], &announcement)
 			if err != nil {
 				logger.Error("Error parsing announcement: ", err)
 			} else {
+				announcement.cleanUp()
 				if _, ok := res[announcement.DeviceName]; !ok {
 					res[announcement.DeviceName] = announcement
 					logger.Info("Device: ", announcement.DeviceName, "(", announcement.IP, ")", " is online")
@@ -103,7 +116,7 @@ func Listen(ifi string) error {
 
 		if err != nil {
 			logger.Info("Exit with Error: ", err)
-			logger.Info("It may be a timeout, but it's not a problem. Try again...")
+			logger.Info("It may be a timeout, so it's not a problem. Try again...")
 		}
 	}
 }

@@ -17,7 +17,7 @@ var logger = utils.GetInstance()
 func main() {
 	app := &cli.App{
 		Name:      "debug-cli",
-		Version:   "0.0.1",
+		Version:   version.Version,
 		Compiled:  time.Now(),
 		Copyright: "Copyright © 2020 digisynlink",
 		Usage:     "DigitSynlink network debug tool",

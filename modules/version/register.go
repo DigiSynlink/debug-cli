@@ -6,9 +6,9 @@ import (
 
 func RegisterCommand(app *cli.App) {
 	app.Commands = append(app.Commands, &cli.Command{
-		Name:    "version",
+		Name:    "build-version",
 		Aliases: []string{"v"},
-		Usage:   "Show version",
+		Usage:   "Show Build version",
 		Action: func(cCtx *cli.Context) error {
 			ShowVersion()
 			return nil
