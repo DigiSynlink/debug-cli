@@ -15,7 +15,7 @@ func RegisterCommand(app *cli.App) {
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:  "verbose",
-						Usage: "Showing more information with 3rd Party",
+						Usage: "Showing more information with Pcap(currently not implemented due to cgo dependency)",
 						Value: false,
 					},
 				},
