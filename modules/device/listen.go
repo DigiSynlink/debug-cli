@@ -10,23 +10,6 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-var announceAddr = "239.255.255.254:9900"
-
-type DeviceAnnouncement struct {
-	Action          string `json:"action"`
-	Active          string `json:"active"`
-	Hostname        string `json:"hostname"`
-	DeviceName      string `json:"device_name"`
-	DeviceCategory  string `json:"device_category"`
-	DeviceType      string `json:"device_type"`
-	ChannelNumber   string `json:"channel_num"`
-	InChannelNames  string `json:"in_channel_names"`
-	OutChannelNames string `json:"out_channel_names"`
-	IP              string `json:"ip"`
-	IPConflict      string `json:"ip_conflict"`
-	OnlineVersion   string `json:"online_version"`
-}
-
 func (d *DeviceAnnouncement) cleanUp() {
 	name, err := url.QueryUnescape(d.DeviceName)
 	if err != nil {
@@ -43,12 +26,9 @@ func ListenEntry(cCtx *cli.Context) error {
 	if ifi == "" {
 		logger.Warn("No interface specified, system will assign random interface for boardcast, which is not desired in most cases.")
 	} else {
-		has, err := HasInterface(ifi)
+		_, err := net.InterfaceByName(ifi)
 		if err != nil {
 			return err
-		}
-		if !has {
-			return fmt.Errorf("interface %s not found", ifi)
 		}
 	}
 

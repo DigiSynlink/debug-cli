@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/digisynlink/debug-cli/modules/device"
+	"github.com/digisynlink/debug-cli/modules/settings"
 	"github.com/digisynlink/debug-cli/modules/version"
 	"github.com/digisynlink/debug-cli/utils"
 	"github.com/sirupsen/logrus"
@@ -42,6 +43,7 @@ func main() {
 
 	device.RegisterCommand(app)
 	version.RegisterCommand(app)
+	settings.RegisterCommand(app)
 
 	if err := app.Run(os.Args); err != nil {
 		logger.Fatal(err)

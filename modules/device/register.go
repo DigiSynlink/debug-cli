@@ -12,20 +12,23 @@ func RegisterCommand(app *cli.App) {
 		Name:    "device",
 		Aliases: []string{"d"},
 		Usage:   "Device Actions",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:        "interface",
-				Usage:       "Interface to use",
-				DefaultText: "eth0",
-			},
-		},
 		Subcommands: []*cli.Command{
 			{
 				Name:    "discover",
 				Aliases: []string{"d"},
-				Usage:   "Device Discovery",
+				Usage:   "Device Discover",
 				Action:  DiscoverEntry,
 				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "interface",
+						Usage:       "Interface to use",
+						DefaultText: "eth0",
+					},
+					&cli.StringFlag{
+						Name:        "bind-address",
+						Usage:       "Bind to address",
+						DefaultText: "169.254.0.2",
+					},
 					&cli.StringFlag{
 						Name:    "boardcast-address",
 						Aliases: []string{"baddr"},
@@ -42,9 +45,14 @@ func RegisterCommand(app *cli.App) {
 			{
 				Name:    "listen",
 				Aliases: []string{"l"},
-				Usage:   "Listen to Announcement",
+				Usage:   "Listen to Multicast Announcement",
 				Action:  ListenEntry,
 				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:        "interface",
+						Usage:       "Interface to use",
+						DefaultText: "eth0",
+					},
 					&cli.StringFlag{
 						Name:    "listen-address",
 						Aliases: []string{"laddr"},
