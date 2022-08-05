@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/digisynlink/debug-cli/modules/device"
+	"github.com/digisynlink/debug-cli/modules/netif"
 	"github.com/digisynlink/debug-cli/modules/settings"
 	"github.com/digisynlink/debug-cli/modules/version"
 	"github.com/digisynlink/debug-cli/utils"
@@ -17,7 +18,7 @@ var logger = utils.GetInstance()
 
 func main() {
 	app := &cli.App{
-		Name:      "debug-cli",
+		Name:      utils.BINARY_NAME,
 		Version:   version.Version,
 		Compiled:  time.Now(),
 		Copyright: "Copyright © 2020 digisynlink",
@@ -44,6 +45,7 @@ func main() {
 	device.RegisterCommand(app)
 	version.RegisterCommand(app)
 	settings.RegisterCommand(app)
+	netif.RegisterCommand(app)
 
 	if err := app.Run(os.Args); err != nil {
 		logger.Fatal(err)

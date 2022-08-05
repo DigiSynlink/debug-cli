@@ -22,34 +22,28 @@ func (d *DeviceAnnouncement) cleanUp() {
 func ListenEntry(cCtx *cli.Context) error {
 	ifi := cCtx.String("interface")
 	announceAddr = cCtx.String("listen-address")
+	logger.Info("Listening on interface: ", ifi)
 
+	var iface *net.Interface
+	var err error
 	if ifi == "" {
 		logger.Warn("No interface specified, system will assign random interface for boardcast, which is not desired in most cases.")
 	} else {
-		_, err := net.InterfaceByName(ifi)
+		iface, err = GetNetworkInterface(ifi)
 		if err != nil {
 			return err
 		}
 	}
 
-	return Listen(ifi)
+	return Listen(iface)
 }
 
-func Listen(ifi string) error {
-	logger.Info("Listening on interface: ", ifi)
+func Listen(iface *net.Interface) error {
 	logger.Info("Announce address: ", announceAddr)
 	addr, err := net.ResolveUDPAddr("udp4", announceAddr)
 
 	if err != nil {
 		return err
-	}
-
-	var iface *net.Interface
-	if ifi != "" {
-		iface, err = net.InterfaceByName(ifi)
-		if err != nil {
-			return err
-		}
 	}
 
 	pc, err := net.ListenMulticastUDP("udp4", iface, addr)
@@ -65,7 +59,7 @@ func Listen(ifi string) error {
 	res := make(map[string]DeviceAnnouncement)
 
 	for {
-		logger.Info("Waiting for a response... 1min Deadline")
+		logger.Info("Waiting for responses... 1min Deadline")
 		pc.SetReadDeadline(time.Now().Add(time.Minute * 1))
 		n, dst, err := pc.ReadFrom(buf)
 		if n > 0 {

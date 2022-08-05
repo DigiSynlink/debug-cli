@@ -21,12 +21,12 @@ func RegisterCommand(app *cli.App) {
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:        "interface",
-						Usage:       "Interface to use",
+						Usage:       "Interface to use, Windows user should use friendly name. Use 'interface list' to find all interface",
 						DefaultText: "eth0",
 					},
 					&cli.StringFlag{
 						Name:        "bind-address",
-						Usage:       "Bind to address",
+						Usage:       "Bind to address, specify either interface or directly given bind-address to lock down interface",
 						DefaultText: "169.254.0.2",
 					},
 					&cli.StringFlag{
@@ -50,7 +50,7 @@ func RegisterCommand(app *cli.App) {
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:        "interface",
-						Usage:       "Interface to use",
+						Usage:       "Interface to use, Windows user should use friendly name. Use 'interface list' to find all interface",
 						DefaultText: "eth0",
 					},
 					&cli.StringFlag{

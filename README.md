@@ -8,6 +8,25 @@ DigiSyn Link Network Debug CLI
 
 For more info, run without any args to see help info
 
+### For Windows User Interface name
+
+Use your devices' friendly name. 
+
+```powershell
+$ .\debug-cli.exe interface list
+time="2022-08-05T00:46:36-07:00" level=info msg="Devices found:"
+- 'Ethernet'
+- 'Wi-Fi'
+- 'Local Area Connection* 1'
+- 'Local Area Connection* 2'
+- 'Loopback Pseudo-Interface 1'
+- 'vEthernet (WSL)'
+```
+
+```powershell
+.\debug-cli.exe --lvl debug device discover --interface "vEthernet (WSL)"
+```
+
 ### Find Device on Interface
 
 ```bash

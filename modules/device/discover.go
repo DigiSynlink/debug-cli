@@ -34,9 +34,9 @@ func LookForDevice(bindAddr string, iface string) error {
 	logger := utils.GetInstance()
 
 	if iface != "" {
-		logger.Info("Auto-binding to interface: ", iface)
+		logger.Info("Interface specified, using auto-binding from interface: ", iface)
 
-		ifi, err := net.InterfaceByName(iface)
+		ifi, err := GetNetworkInterface(iface)
 		if err != nil {
 			return err
 		}
@@ -98,7 +98,7 @@ func LookForDevice(bindAddr string, iface string) error {
 	buf := make([]byte, 1024)
 
 	for {
-		logger.Info("Waiting for a response... 1min Deadline")
+		logger.Info("Waiting for responses... 1min Deadline")
 		conn.SetReadDeadline(time.Now().Add(time.Minute))
 		n, dst, err := conn.ReadFrom(buf)
 		if n > 0 {

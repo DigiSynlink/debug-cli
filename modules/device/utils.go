@@ -2,6 +2,7 @@ package device
 
 import (
 	"fmt"
+	"net"
 	"strings"
 )
 
@@ -80,4 +81,8 @@ func ParseDeviceEcho(data []byte) (*DeviceEcho, error) {
 	}
 
 	return echo, nil
+}
+
+func GetNetworkInterface(ifi string) (iface *net.Interface, err error) {
+	return net.InterfaceByName(ifi)
 }
